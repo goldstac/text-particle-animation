@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subscribe Animation</title>
+<style>
+  html, body { margin:0; padding:0; overflow:hidden; background:#111; }
+  canvas { display:block; }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let w, h;
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+const mouse = { x: w/2, y: h/2 };
+
+// Track mouse
+window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+// Create particles from text
+const particles = [];
+const text = "Subscribe !!!";
+ctx.font = "bold 150px Arial";
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+ctx.fillStyle = "white";
+ctx.fillText(text, w/2, h/2);
+
+const imageData = ctx.getImageData(0,0,w,h).data;
+for(let y=0; y<h; y+=6){
+  for(let x=0; x<w; x+=6){
+    const index = (x + y*w)*4;
+    if(imageData[index+3] > 128){
+      particles.push({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        tx: x,
+        ty: y,
+        vx: 0,
+        vy: 0,
+        size: 2 + Math.random()*2
+      });
+    }
+  }
+}
+
+ctx.clearRect(0,0,w,h);
+
+// Animation loop
+function animate(){
+  requestAnimationFrame(animate);
+  ctx.fillStyle = "rgba(17,17,17,0.3)";
+  ctx.fillRect(0,0,w,h);
+
+  particles.forEach(p => {
+    // attraction to target
+    let dx = p.tx - p.x;
+    let dy = p.ty - p.y;
+    p.vx += dx*0.01;
+    p.vy += dy*0.01;
+
+    // repel from mouse
+    let mdx = p.x - mouse.x;
+    let mdy = p.y - mouse.y;
+    let dist = Math.sqrt(mdx*mdx + mdy*mdy);
+    if(dist < 100){
+      let force = (100 - dist)/100;
+      p.vx += (mdx/dist)*force*5;
+      p.vy += (mdy/dist)*force*5;
+    }
+
+    // friction
+    p.vx *= 0.85;
+    p.vy *= 0.85;
+
+    p.x += p.vx;
+    p.y += p.vy;
+
+    ctx.fillStyle = "#ff3d3d";
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    ctx.fill();
+  });
+}
+animate();
+</script>
+</body>
+</html>
