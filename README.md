@@ -1,6 +1,6 @@
 # Text Particle Animation
 
-🎆 Make your text come alive with interactive particles!  
+ Make your text come alive with interactive particles!  
 
 This repository contains a **cool particle-based text animation** built with HTML, CSS, and JavaScript.  
 Move your mouse around the screen and watch the particles react in real time.  
